@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { axiosInstance } from "../../lib/axios";
 import Select from "react-select";
 
 export default function CheckoutPage() {
@@ -18,8 +19,8 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     if (token) {
-      axios
-        .get("http://localhost:5000/customerAuth/customer/me", {
+      axiosInstance
+        .get("/customerAuth/customer/me", {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((res) => setCustomer(res.data.customer))
@@ -29,8 +30,8 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     if (city.trim()) {
-      axios
-        .get("http://localhost:5000/novaposhta/cities", { params: { name: city } })
+      axiosInstance
+        .get("/novaposhta/cities", { params: { name: city } })
         .then((res) => {
           const options = res.data.map((c) => ({ label: c.label, value: c.value }));
           setCityOptions(options);
@@ -41,8 +42,8 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     if (selectedCity?.value) {
-      axios
-        .get("http://localhost:5000/novaposhta/warehouses", {
+      axiosInstance
+        .get("/novaposhta/warehouses", {
           params: { cityRef: selectedCity.value },
         })
         .then((res) => {
@@ -60,7 +61,7 @@ export default function CheckoutPage() {
     }
 
     try {
-      const { data: cartRes } = await axios.get("http://localhost:5000/cart", {
+      const { data: cartRes } = await axiosInstance.get("/cart", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -91,8 +92,8 @@ export default function CheckoutPage() {
           })
         );
 
-        const { data: paymentData } = await axios.post(
-          "http://localhost:5000/liqpay/create-payment",
+        const { data: paymentData } = await axiosInstance.post(
+          "/liqpay/create-payment",
           {
             amount: totalPrice,
             orderInfo: `Замовлення від ${customer.name}`,
@@ -106,8 +107,8 @@ export default function CheckoutPage() {
         return (window.location.href = paymentData.paymentUrl);
       }
 
-      await axios.post(
-        "http://localhost:5000/orders",
+      await axiosInstance.post(
+        "/orders",
         {
           customerName: customer.name,
           customerEmail: customer.email,
@@ -125,7 +126,7 @@ export default function CheckoutPage() {
         }
       );
 
-      await axios.post("http://localhost:5000/cart/clear", null, {
+      await axiosInstance.post("/cart/clear", null, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

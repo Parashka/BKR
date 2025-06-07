@@ -22,9 +22,9 @@ export default function CartPage() {
 
   const updateQuantity = (productId, quantity) => {
     if (quantity < 1) return;
-    axios
+    axiosInstance
       .post(
-        "http://localhost:5000/cart/update",
+        "/cart/update",
         { productId, quantity },
         { headers: { Authorization: `Bearer ${token}` } }
       )
@@ -40,8 +40,8 @@ export default function CartPage() {
   };
 
   const removeFromCart = (productId) => {
-    axios
-      .delete(`http://localhost:5000/cart/remove/${productId}`, {
+    axiosInstance
+      .delete(`/cart/remove/${productId}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(() => {
