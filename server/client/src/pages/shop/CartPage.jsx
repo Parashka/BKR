@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { axiosInstance } from "../../lib/axios";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { FaTrash, FaShoppingCart } from "react-icons/fa";
@@ -11,8 +12,8 @@ export default function CartPage() {
   useEffect(() => {
     if (!token) return navigate("/auth");
 
-    axios
-      .get("http://localhost:5000/cart", {
+    axiosInstance
+      .get("/cart", {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setCartItems(res.data.cart))

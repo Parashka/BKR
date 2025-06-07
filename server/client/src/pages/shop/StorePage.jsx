@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { axiosInstance } from "../../lib/axios";
 import axios from "axios";
 import { FaUserCircle, FaShoppingCart, FaCogs } from "react-icons/fa";
 
@@ -18,20 +19,20 @@ export default function StorePage() {
   const paginatedProducts = products.slice((currentPage - 1) * PRODUCTS_PER_PAGE, currentPage * PRODUCTS_PER_PAGE);
 
   useEffect(() => {
-    axios.get("http://localhost:5000/products").then((res) => setProducts(res.data));
-    axios.get("http://localhost:5000/store-name").then((res) => {
+    axiosInstance.get("/products").then((res) => setProducts(res.data));
+    axiosInstance.get("/store-name").then((res) => {
       if (res.data.name) setStoreName(res.data.name);
     });
 
     const token = localStorage.getItem("customerToken");
     if (token) {
-      axios
-        .get("http://localhost:5000/customerAuth/customer/me", {
+      axiosInstance
+        .get("/customerAuth/customer/me", {
           headers: { Authorization: `Bearer ${token}` },
         })
         .then((res) => {
           setCustomer(res.data.customer);
-          return axios.get("http://localhost:5000/cart", {
+          return axiosInstance.get("/cart", {
             headers: { Authorization: `Bearer ${token}` },
           });
         })
@@ -49,14 +50,14 @@ export default function StorePage() {
     if (!token) return navigate("/customerAuth");
 
     try {
-      await axios.post(
-        "http://localhost:5000/cart/add",
+      await axiosInstance.post(
+        "/cart/add",
         { productId: product._id },
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      const res = await axios.get("http://localhost:5000/cart", {
+      const res = await axiosInstance.get("/cart", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setCart(res.data.cart);
