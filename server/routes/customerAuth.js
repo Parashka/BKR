@@ -1,4 +1,4 @@
-// Додаткові залежності
+
 const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -7,10 +7,8 @@ const Customer = require("../models/Customer");
 const protectCustomer = require("../middleware/protectCustomer");
 const router = express.Router();
 
-// Тимчасове сховище (можна замінити на Redis)
 const pendingRegistrations = new Map();
 
-// Транспорт для відправки email
 const transporter = nodemailer.createTransport({
   service: "Gmail",
   auth: {
@@ -19,7 +17,7 @@ const transporter = nodemailer.createTransport({
   }
 });
 
-// 1. Ініціація реєстрації
+
 router.post("/initiate-registration", async (req, res) => {
   const { name, email, phone, password } = req.body;
   if (!name || !email || !password) {

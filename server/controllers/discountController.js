@@ -12,31 +12,23 @@ const getAllDiscounts = async (req, res) => {
 
 const createDiscount = async (req, res) => {
   const { percentage, productId } = req.body;
-
   if (!percentage || !productId) {
     return res.status(400).json({ message: "Необхідно вказати всі поля" });
   }
-
   try {
     const product = await Product.findById(productId);
     if (!product) {
       return res.status(404).json({ message: "Товар не знайдено" });
     }
 
-    // Якщо originalPrice ще не збережено — зберігаємо його
     if (!product.originalPrice) {
       product.originalPrice = product.price;
     }
-
-    // Обчислюємо нову ціну
     const discountFactor = (100 - percentage) / 100;
     product.price = Math.round(product.originalPrice * discountFactor);
-
     await product.save();
-
     const newDiscount = new Discount({ percentage, productId });
     await newDiscount.save();
-
     res.status(201).json({ message: "Знижку застосовано", discount: newDiscount });
   } catch (err) {
     console.error(err);
